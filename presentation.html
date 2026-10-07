@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { overflow: hidden; }
+    .slide { display: none; width: 100%; min-height: 100vh; padding: 48px 64px; flex-direction: column; justify-content: flex-start; }
+    .slide.active { display: flex; }
+    .slide-number { position: fixed; bottom: 24px; right: 40px; font-size: 14px; opacity: 0.5; }
+    .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); z-index: 50; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(128,128,128,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; transition: all 0.2s; }
+    .nav-btn:hover { transform: translateY(-50%) scale(1.1); }
+    .nav-prev { left: 16px; }
+    .nav-next { right: 16px; }
+    .pipeline-box { border: 2px solid; border-radius: 12px; padding: 16px 20px; text-align: center; min-width: 160px; }
+    .arrow-right { font-size: 28px; margin: 0 8px; }
+    .feature-card { border-radius: 10px; padding: 16px; border: 1px solid rgba(128,128,128,0.2); }
+    .code-block { font-family: 'Courier New', monospace; font-size: 13px; border-radius: 8px; padding: 16px; overflow-x: auto; white-space: pre; }
+    .tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; margin: 4px; }
+    .progress-bar { position: fixed; top: 0; left: 0; height: 4px; transition: width 0.3s ease; z-index: 100; }
+    @media print {
+      .slide { display: flex !important; page-break-after: always; min-height: 100vh; }
+      .nav-btn, .slide-number, .progress-bar { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased">
+
+  <!-- Progress Bar -->
+  <div class="progress-bar bg-blue-500" id="progressBar"></div>
+
+  <!-- Navigation Buttons -->
+  <button class="nav-btn bg-[var(--card)] text-[var(--foreground)] nav-prev" onclick="changeSlide(-1)">←</button>
+  <button class="nav-btn bg-[var(--card)] text-[var(--foreground)] nav-next" onclick="changeSlide(1)">→</button>
+
+  <!-- ==================== SLIDE 1: TITLE ==================== -->
+  <div class="slide active" id="slide-1">
+    <div class="flex flex-col items-center justify-center flex-1 text-center">
+      <div class="text-6xl mb-6">🩺</div>
+      <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+        Diabetes Risk & Lifestyle Advisor
+      </h1>
+      <p class="text-xl text-[var(--muted-foreground)] mb-2">An AI-Powered Decision Support System</p>
+      <div class="w-24 h-1 bg-blue-500 rounded-full my-6"></div>
+      <p class="text-lg text-[var(--muted-foreground)]">Essentials of Artificial Intelligence — Group Project</p>
+      <div class="mt-8 flex gap-6 text-[var(--muted-foreground)] text-sm">
+        <span>👤 Member 1</span>
+        <span>👤 Member 2</span>
+        <span>👤 Member 3</span>
+        <span>👤 Member 4</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 2: PROBLEM STATEMENT ==================== -->
+  <div class="slide" id="slide-2">
+    <h2 class="text-3xl font-bold mb-2">🎯 Problem Statement</h2>
+    <div class="w-16 h-1 bg-red-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8 flex-1">
+      <div>
+        <h3 class="text-xl font-semibold mb-4 text-red-400">The Challenge</h3>
+        <ul class="space-y-4 text-lg">
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-1">●</span>
+            <span>Diabetes affects <strong>537 million adults</strong> globally (IDF, 2021)</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-1">●</span>
+            <span>Nearly <strong>50%</strong> of cases remain <strong>undiagnosed</strong></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-1">●</span>
+            <span>Early detection can <strong>prevent or delay</strong> complications</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-1">●</span>
+            <span>Lifestyle changes can reduce risk by up to <strong>58%</strong></span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4 text-green-400">Our Solution</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6">
+          <p class="text-lg mb-4">A <strong>hybrid AI system</strong> that combines three AI techniques to:</p>
+          <ul class="space-y-3">
+            <li>✅ <strong>Predict</strong> diabetes risk from health metrics</li>
+            <li>✅ <strong>Categorize</strong> risk with expert-informed fuzzy logic</li>
+            <li>✅ <strong>Recommend</strong> personalized lifestyle changes</li>
+            <li>✅ Provide an <strong>interactive web interface</strong> for easy access</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 3: DATASET ==================== -->
+  <div class="slide" id="slide-3">
+    <h2 class="text-3xl font-bold mb-2">📊 Dataset — Pima Indians Diabetes</h2>
+    <div class="w-16 h-1 bg-yellow-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-6">
+          <h3 class="text-lg font-semibold mb-3">Source & Details</h3>
+          <ul class="space-y-2 text-[var(--muted-foreground)]">
+            <li>📁 <strong>Source:</strong> NIDDK / UCI ML Repository</li>
+            <li>📝 <strong>Records:</strong> 768 patients</li>
+            <li>📐 <strong>Features:</strong> 8 health metrics + 1 outcome</li>
+            <li>👥 <strong>Population:</strong> Pima Native American women, age ≥ 21</li>
+          </ul>
+        </div>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6">
+          <h3 class="text-lg font-semibold mb-3">Data Preprocessing</h3>
+          <ul class="space-y-2 text-[var(--muted-foreground)]">
+            <li>🔄 Replace biologically impossible zeros with NaN</li>
+            <li>📊 Impute missing values with column medians</li>
+            <li>⚖️ StandardScaler normalization</li>
+            <li>✂️ 80/20 stratified train-test split</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-3">Features</h3>
+        <div class="space-y-2">
+          <div class="feature-card bg-[var(--card)]"><strong>Pregnancies</strong> — Number of pregnancies</div>
+          <div class="feature-card bg-[var(--card)]"><strong>Glucose</strong> — Plasma glucose concentration (mg/dL)</div>
+          <div class="feature-card bg-[var(--card)]"><strong>BloodPressure</strong> — Diastolic blood pressure (mm Hg)</div>
+          <div class="feature-card bg-[var(--card)]"><strong>SkinThickness</strong> — Triceps skin fold (mm)</div>
+          <div class="feature-card bg-[var(--card)]"><strong>Insulin</strong> — 2-Hour serum insulin (μU/mL)</div>
+          <div class="feature-card bg-[var(--card)]"><strong>BMI</strong> — Body mass index (kg/m²)</div>
+          <div class="feature-card bg-[var(--card)]"><strong>DiabetesPedigreeFunction</strong> — Family history score</div>
+          <div class="feature-card bg-[var(--card)]"><strong>Age</strong> — Age in years</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 4: SYSTEM ARCHITECTURE ==================== -->
+  <div class="slide" id="slide-4">
+    <h2 class="text-3xl font-bold mb-2">🏗️ System Architecture</h2>
+    <div class="w-16 h-1 bg-purple-500 rounded-full mb-8"></div>
+    <p class="text-lg text-[var(--muted-foreground)] mb-8">Our system uses a three-stage sequential pipeline, where each stage feeds into the next:</p>
+    <div class="flex items-center justify-center gap-4 mb-10 flex-wrap">
+      <div class="pipeline-box border-blue-500 bg-blue-500/10">
+        <div class="text-3xl mb-2">🧠</div>
+        <div class="font-bold text-blue-400">Stage 1</div>
+        <div class="text-sm text-[var(--muted-foreground)]">Neural Network</div>
+        <div class="text-xs mt-1 text-[var(--muted-foreground)]">Risk Probability</div>
+      </div>
+      <div class="arrow-right text-[var(--muted-foreground)]">→</div>
+      <div class="pipeline-box border-green-500 bg-green-500/10">
+        <div class="text-3xl mb-2">🌫️</div>
+        <div class="font-bold text-green-400">Stage 2</div>
+        <div class="text-sm text-[var(--muted-foreground)]">Fuzzy Logic</div>
+        <div class="text-xs mt-1 text-[var(--muted-foreground)]">Risk Category</div>
+      </div>
+      <div class="arrow-right text-[var(--muted-foreground)]">→</div>
+      <div class="pipeline-box border-orange-500 bg-orange-500/10">
+        <div class="text-3xl mb-2">📋</div>
+        <div class="font-bold text-orange-400">Stage 3</div>
+        <div class="text-sm text-[var(--muted-foreground)]">Rule-Based Engine</div>
+        <div class="text-xs mt-1 text-[var(--muted-foreground)]">Recommendations</div>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-6 mt-4">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 text-center">
+        <p class="font-semibold text-blue-400 mb-1">Data-Driven</p>
+        <p class="text-sm text-[var(--muted-foreground)]">Learns patterns from 768 patient records to output a continuous risk probability (0.0–1.0)</p>
+      </div>
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 text-center">
+        <p class="font-semibold text-green-400 mb-1">Expert-Informed</p>
+        <p class="text-sm text-[var(--muted-foreground)]">Uses 36 hand-crafted fuzzy rules with BMI & activity level to produce nuanced risk categories</p>
+      </div>
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 text-center">
+        <p class="font-semibold text-orange-400 mb-1">Actionable Output</p>
+        <p class="text-sm text-[var(--muted-foreground)]">Generates 25–30 context-specific lifestyle & medical recommendations per patient</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 5: NEURAL NETWORK ==================== -->
+  <div class="slide" id="slide-5">
+    <h2 class="text-3xl font-bold mb-2">🧠 Stage 1 — Neural Network</h2>
+    <div class="w-16 h-1 bg-blue-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Model Architecture</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-6">
+          <table class="w-full text-left">
+            <tbody>
+              <tr class="border-b border-[var(--border)]"><td class="py-2 text-[var(--muted-foreground)]">Type</td><td class="py-2 font-semibold">MLPClassifier (scikit-learn)</td></tr>
+              <tr class="border-b border-[var(--border)]"><td class="py-2 text-[var(--muted-foreground)]">Hidden Layers</td><td class="py-2 font-semibold">2 layers (16, 8 neurons)</td></tr>
+              <tr class="border-b border-[var(--border)]"><td class="py-2 text-[var(--muted-foreground)]">Activation</td><td class="py-2 font-semibold">ReLU</td></tr>
+              <tr class="border-b border-[var(--border)]"><td class="py-2 text-[var(--muted-foreground)]">Optimizer</td><td class="py-2 font-semibold">Adam</td></tr>
+              <tr class="border-b border-[var(--border)]"><td class="py-2 text-[var(--muted-foreground)]">Max Iterations</td><td class="py-2 font-semibold">500</td></tr>
+              <tr><td class="py-2 text-[var(--muted-foreground)]">Output</td><td class="py-2 font-semibold">Risk probability (0.0–1.0)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="text-xl font-semibold mb-3">Key Features</h3>
+        <ul class="space-y-2 text-[var(--muted-foreground)]">
+          <li>📦 Model persistence via <strong>joblib</strong> (model.pkl, scaler.pkl)</li>
+          <li>🔄 Auto-training if saved model not found</li>
+          <li>📊 Evaluation: Accuracy, Precision, Recall, F1, Confusion Matrix</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Network Diagram</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-8 flex flex-col items-center">
+          <div class="flex items-center gap-12">
+            <!-- Input -->
+            <div class="flex flex-col gap-1 items-center">
+              <span class="text-xs text-[var(--muted-foreground)] mb-2">Input (8)</span>
+              <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-500"></div>
+              <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-500"></div>
+              <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-500"></div>
+              <div class="text-[var(--muted-foreground)] text-xs">⋮</div>
+              <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-500"></div>
+              <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-500"></div>
+            </div>
+            <!-- Hidden 1 -->
+            <div class="flex flex-col gap-1 items-center">
+              <span class="text-xs text-[var(--muted-foreground)] mb-2">Hidden (16)</span>
+              <div class="w-6 h-6 rounded-full bg-purple-500/40 border border-purple-500"></div>
+              <div class="w-6 h-6 rounded-full bg-purple-500/40 border border-purple-500"></div>
+              <div class="w-6 h-6 rounded-full bg-purple-500/40 border border-purple-500"></div>
+              <div class="text-[var(--muted-foreground)] text-xs">⋮</div>
+              <div class="w-6 h-6 rounded-full bg-purple-500/40 border border-purple-500"></div>
+              <div class="w-6 h-6 rounded-full bg-purple-500/40 border border-purple-500"></div>
+            </div>
+            <!-- Hidden 2 -->
+            <div class="flex flex-col gap-1 items-center">
+              <span class="text-xs text-[var(--muted-foreground)] mb-2">Hidden (8)</span>
+              <div class="w-6 h-6 rounded-full bg-pink-500/40 border border-pink-500"></div>
+              <div class="w-6 h-6 rounded-full bg-pink-500/40 border border-pink-500"></div>
+              <div class="w-6 h-6 rounded-full bg-pink-500/40 border border-pink-500"></div>
+              <div class="text-[var(--muted-foreground)] text-xs">⋮</div>
+              <div class="w-6 h-6 rounded-full bg-pink-500/40 border border-pink-500"></div>
+            </div>
+            <!-- Output -->
+            <div class="flex flex-col gap-1 items-center">
+              <span class="text-xs text-[var(--muted-foreground)] mb-2">Output</span>
+              <div class="w-8 h-8 rounded-full bg-green-500/40 border-2 border-green-500 flex items-center justify-center text-xs">P</div>
+            </div>
+          </div>
+          <p class="text-sm text-[var(--muted-foreground)] mt-6">8 features → 16 neurons → 8 neurons → Risk probability</p>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-xl font-semibold mb-3">Data Preprocessing</h3>
+          <div class="code-block bg-[var(--card)] border border-[var(--border)] text-sm">
+# Replace biologically impossible zeros
+cols = ['Glucose','BloodPressure','SkinThickness',
+        'Insulin','BMI']
+df[cols] = df[cols].replace(0, np.nan)
+df.fillna(df.median(), inplace=True)
+
+# Normalize features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 6: FUZZY LOGIC ==================== -->
+  <div class="slide" id="slide-6">
+    <h2 class="text-3xl font-bold mb-2">🌫️ Stage 2 — Fuzzy Logic Engine</h2>
+    <div class="w-16 h-1 bg-green-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Why Fuzzy Logic?</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-6">
+          <p class="text-[var(--muted-foreground)] mb-3">Neural networks output a number — but health risk isn't black and white. Fuzzy logic adds <strong>nuance</strong> by modeling "degrees of truth".</p>
+          <p class="text-[var(--muted-foreground)]">Example: A BMI of 29.5 is <strong>partially</strong> "overweight" and <strong>partially</strong> "obese" — fuzzy logic handles this naturally.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Input Variables (Antecedents)</h3>
+        <div class="space-y-3">
+          <div class="feature-card bg-[var(--card)]">
+            <strong>Risk Probability</strong> (0–1.0) → low / medium / high
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>BMI</strong> (0–60) → underweight / normal / overweight / obese
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>Activity Level</strong> (0–10) → sedentary / moderate / active
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold mt-6 mb-4">Output Variable (Consequent)</h3>
+        <div class="feature-card bg-[var(--card)]">
+          <strong>Risk Category</strong> (0–100) → Low (≤25) / Moderate (≤50) / High (≤75) / Severe (>75)
+        </div>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4">36 Fuzzy Rules</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-6">
+          <p class="text-sm text-[var(--muted-foreground)] mb-3">Full combinatorial coverage: 3 × 4 × 3 = 36 rules</p>
+          <div class="space-y-2 text-sm">
+            <div class="p-2 rounded bg-green-500/10 border border-green-500/30">
+              <strong>IF</strong> risk=low <strong>AND</strong> BMI=normal <strong>AND</strong> activity=active <strong>THEN</strong> category=<span class="text-green-400">Low</span>
+            </div>
+            <div class="p-2 rounded bg-yellow-500/10 border border-yellow-500/30">
+              <strong>IF</strong> risk=medium <strong>AND</strong> BMI=overweight <strong>AND</strong> activity=moderate <strong>THEN</strong> category=<span class="text-yellow-400">Moderate</span>
+            </div>
+            <div class="p-2 rounded bg-red-500/10 border border-red-500/30">
+              <strong>IF</strong> risk=high <strong>AND</strong> BMI=obese <strong>AND</strong> activity=sedentary <strong>THEN</strong> category=<span class="text-red-400">Severe</span>
+            </div>
+            <div class="text-center text-[var(--muted-foreground)]">⋮ (33 more rules)</div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Membership Functions</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6">
+          <ul class="space-y-2 text-[var(--muted-foreground)]">
+            <li>📐 <strong>Trapezoidal</strong> (trapmf) — for boundary categories</li>
+            <li>📐 <strong>Triangular</strong> (trimf) — for middle categories</li>
+            <li>🔄 <strong>Overlapping</strong> boundaries for smooth transitions</li>
+            <li>⚙️ <strong>Centroid</strong> defuzzification method</li>
+            <li>🛡️ <strong>Input clamping</strong> to avoid edge-case crashes</li>
+            <li>🔙 <strong>Fallback</strong> if no rules fire: risk_prob × 100</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 7: RULE-BASED ENGINE ==================== -->
+  <div class="slide" id="slide-7">
+    <h2 class="text-3xl font-bold mb-2">📋 Stage 3 — Rule-Based Engine</h2>
+    <div class="w-16 h-1 bg-orange-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-semibold mb-4">How It Works</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-6">
+          <p class="text-[var(--muted-foreground)] mb-4">Translates the fuzzy logic output into <strong>actionable, personalized recommendations</strong> using deterministic if/elif logic.</p>
+          <div class="text-sm space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-green-500"></span>
+              <strong>Low Risk</strong> — 4 maintenance recommendations
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+              <strong>Moderate Risk</strong> — 4 proactive recommendations
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500"></span>
+              <strong>High Risk</strong> — 5 urgent recommendations
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-900"></span>
+              <strong>Severe Risk</strong> — 5 critical recommendations
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Always Includes</h3>
+        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
+          <p class="text-sm">⚠️ <strong>Medical Disclaimer</strong> — Always the first recommendation, emphasizing this is a screening tool, not a diagnosis.</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4">6 Metric-Specific Modifiers</h3>
+        <p class="text-sm text-[var(--muted-foreground)] mb-4">Additional recommendations are added based on individual health metrics:</p>
+        <div class="space-y-3">
+          <div class="feature-card bg-[var(--card)]">
+            <strong>🩸 Glucose</strong> — Extra advice if > 140 or > 180 mg/dL
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>⚖️ BMI</strong> — Guidance for underweight (<18.5), obese (>30), severely obese (>35)
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>💓 Blood Pressure</strong> — Alerts if > 90 or > 100 mm Hg
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>💉 Insulin</strong> — Special advice if > 200 μU/mL
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>🎂 Age</strong> — Additional screening for > 45 or > 60
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>👨‍👩‍👦 Family History</strong> — Heightened alerts if score > 0.5 or > 0.8
+          </div>
+        </div>
+        <div class="mt-4 bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-orange-400">~25–30</p>
+          <p class="text-sm text-[var(--muted-foreground)]">distinct recommendations contextually selected per patient</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 8: WEB INTERFACE ==================== -->
+  <div class="slide" id="slide-8">
+    <h2 class="text-3xl font-bold mb-2">🖥️ Web Interface — Streamlit Dashboard</h2>
+    <div class="w-16 h-1 bg-cyan-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Interface Features</h3>
+        <div class="space-y-3">
+          <div class="feature-card bg-[var(--card)]">
+            <strong>📝 Input Form</strong> — 9 health metric fields in a clean 3-column layout
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>📊 Sidebar</strong> — About, Dataset Info, Limitations, Tech Stack
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>🎨 Color-Coded Results</strong> — Green (Low), Yellow (Moderate), Red (High), Dark Red (Severe)
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>📋 Recommendations</strong> — Context-aware icons (🏃 exercise, 🥗 diet, 🏥 medical)
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>🔍 Detailed Breakdown</strong> — Expandable JSON outputs for each pipeline stage
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>⚙️ Auto-Training</strong> — Model trains automatically on first use if not found
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Technology Stack</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-2 rounded bg-blue-500/10">
+              <span class="font-semibold">Streamlit</span>
+              <span class="tag bg-blue-500/20 text-blue-400">Web Framework</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-green-500/10">
+              <span class="font-semibold">scikit-learn</span>
+              <span class="tag bg-green-500/20 text-green-400">Neural Network</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-purple-500/10">
+              <span class="font-semibold">scikit-fuzzy</span>
+              <span class="tag bg-purple-500/20 text-purple-400">Fuzzy Logic</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-yellow-500/10">
+              <span class="font-semibold">pandas / numpy</span>
+              <span class="tag bg-yellow-500/20 text-yellow-400">Data Processing</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-red-500/10">
+              <span class="font-semibold">joblib</span>
+              <span class="tag bg-red-500/20 text-red-400">Serialization</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-cyan-500/10">
+              <span class="font-semibold">Python 3.8+</span>
+              <span class="tag bg-cyan-500/20 text-cyan-400">Runtime</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 9: LIVE DEMO ==================== -->
+  <div class="slide" id="slide-9">
+    <h2 class="text-3xl font-bold mb-2">🎬 Live Demo</h2>
+    <div class="w-16 h-1 bg-pink-500 rounded-full mb-8"></div>
+    <div class="flex flex-col items-center justify-center flex-1">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-10 max-w-3xl w-full text-center">
+        <div class="text-6xl mb-6">🖥️</div>
+        <h3 class="text-2xl font-bold mb-4">Live Application Demonstration</h3>
+        <p class="text-lg text-[var(--muted-foreground)] mb-8">Running the Streamlit dashboard with sample patient data</p>
+        <div class="grid grid-cols-3 gap-6">
+          <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+            <p class="text-3xl mb-2">1️⃣</p>
+            <p class="font-semibold">Enter Metrics</p>
+            <p class="text-xs text-[var(--muted-foreground)] mt-1">Input patient health data</p>
+          </div>
+          <div class="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+            <p class="text-3xl mb-2">2️⃣</p>
+            <p class="font-semibold">Analyze Risk</p>
+            <p class="text-xs text-[var(--muted-foreground)] mt-1">Run 3-stage AI pipeline</p>
+          </div>
+          <div class="p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
+            <p class="text-3xl mb-2">3️⃣</p>
+            <p class="font-semibold">View Results</p>
+            <p class="text-xs text-[var(--muted-foreground)] mt-1">Risk assessment + recommendations</p>
+          </div>
+        </div>
+        <p class="text-sm text-[var(--muted-foreground)] mt-8 italic">💡 Switch to screen share to show the running application</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 10: TESTING ==================== -->
+  <div class="slide" id="slide-10">
+    <h2 class="text-3xl font-bold mb-2">🧪 Testing & Validation</h2>
+    <div class="w-16 h-1 bg-teal-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Test Pipeline (10 Test Profiles)</h3>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between p-2 rounded bg-green-500/10"><span>Healthy Young Woman</span><span class="text-green-400">Low ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-yellow-500/10"><span>Average Middle-Aged</span><span class="text-yellow-400">Moderate ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-yellow-500/10"><span>Overweight Sedentary</span><span class="text-yellow-400">Moderate ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-red-500/10"><span>High-Risk Elderly</span><span class="text-red-400">High ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-yellow-500/10"><span>Borderline Case A</span><span class="text-yellow-400">Varies ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-yellow-500/10"><span>Borderline Case B</span><span class="text-yellow-400">Varies ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-green-500/10"><span>Active + Family History</span><span class="text-green-400">Managed ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-red-500/10"><span>Extreme High Risk</span><span class="text-red-400">Severe ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-green-500/10"><span>Young Underweight</span><span class="text-green-400">Low ✓</span></div>
+            <div class="flex justify-between p-2 rounded bg-yellow-500/10"><span>High BP, Normal Glucose</span><span class="text-yellow-400">Mixed ✓</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Validation Approach</h3>
+        <div class="space-y-4">
+          <div class="feature-card bg-[var(--card)]">
+            <strong>🧠 NN Validation</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-1">Output verified in [0, 1] range for all profiles</p>
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>🌫️ Fuzzy Validation</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-1">Category and score keys verified; category must be Low/Moderate/High/Severe</p>
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>📋 Rules Validation</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-1">Output must be list with ≥2 items; first item must contain "DISCLAIMER"</p>
+          </div>
+          <div class="feature-card bg-[var(--card)]">
+            <strong>🔗 End-to-End</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-1">All 10 profiles run through full pipeline — formatted summary table with NN prob, fuzzy score, category, and recommendation count</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 11: LIMITATIONS & ETHICS ==================== -->
+  <div class="slide" id="slide-11">
+    <h2 class="text-3xl font-bold mb-2">⚠️ Limitations & Ethical Considerations</h2>
+    <div class="w-16 h-1 bg-amber-500 rounded-full mb-8"></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-semibold mb-4 text-amber-400">Limitations</h3>
+        <div class="space-y-4">
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+            <strong>📊 Dataset Bias</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-2">Trained exclusively on Pima Native American women from a 1960s study — may not generalize to men, other ethnicities, or younger populations.</p>
+          </div>
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+            <strong>📏 Limited Features</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-2">Only 8 health metrics — real clinical assessment uses many more factors (HbA1c, fasting glucose, lifestyle, etc.)</p>
+          </div>
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+            <strong>📉 Small Dataset</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-2">Only 768 records — modern clinical AI uses thousands or millions of records.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4 text-green-400">Ethical Safeguards</h3>
+        <div class="space-y-4">
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+            <strong>🏥 Not a Diagnosis</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-2">Framed explicitly as an educational screening tool — disclaimer is always the first recommendation.</p>
+          </div>
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+            <strong>🔒 Privacy</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-2">No real patient data stored. All inputs are processed locally and not persisted.</p>
+          </div>
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+            <strong>⚖️ Error Awareness</strong>
+            <p class="text-sm text-[var(--muted-foreground)] mt-2">Acknowledges potential for false positives/negatives — always recommends professional consultation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 12: CONCLUSION ==================== -->
+  <div class="slide" id="slide-12">
+    <div class="flex flex-col items-center justify-center flex-1 text-center">
+      <div class="text-6xl mb-6">🎯</div>
+      <h2 class="text-4xl font-bold mb-6">Conclusion & Future Work</h2>
+      <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-8"></div>
+      <div class="grid grid-cols-2 gap-8 max-w-4xl mb-10">
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 text-left">
+          <h3 class="text-lg font-semibold mb-3 text-blue-400">What We Achieved</h3>
+          <ul class="space-y-2 text-[var(--muted-foreground)]">
+            <li>✅ Hybrid AI system combining 3 techniques</li>
+            <li>✅ Interactive web interface with Streamlit</li>
+            <li>✅ Personalized risk assessment & recommendations</li>
+            <li>✅ Comprehensive testing with 10 diverse profiles</li>
+            <li>✅ Ethical considerations built in from the start</li>
+          </ul>
+        </div>
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 text-left">
+          <h3 class="text-lg font-semibold mb-3 text-purple-400">Future Improvements</h3>
+          <ul class="space-y-2 text-[var(--muted-foreground)]">
+            <li>🔮 Use a larger, more diverse dataset</li>
+            <li>🔮 Add deep learning (CNN / LSTM) models</li>
+            <li>🔮 Integrate real-time health monitoring (wearables)</li>
+            <li>🔮 Add multi-language support</li>
+            <li>🔮 Clinical validation with healthcare professionals</li>
+          </ul>
+        </div>
+      </div>
+      <div class="text-5xl mb-4">🙏</div>
+      <h3 class="text-2xl font-semibold mb-3">Thank You!</h3>
+      <p class="text-lg text-[var(--muted-foreground)]">Questions?</p>
+      <div class="mt-6 flex gap-4">
+        <span class="tag bg-blue-500/20 text-blue-400">GitHub Repository</span>
+        <span class="tag bg-green-500/20 text-green-400">Live Demo Available</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide Number -->
+  <div class="slide-number text-[var(--muted-foreground)]" id="slideNumber">1 / 12</div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 12;
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      document.getElementById('slide-' + n).classList.add('active');
+      document.getElementById('slideNumber').textContent = n + ' / ' + totalSlides;
+      document.getElementById('progressBar').style.width = ((n / totalSlides) * 100) + '%';
+    }
+
+    function changeSlide(delta) {
+      currentSlide = Math.max(1, Math.min(totalSlides, currentSlide + delta));
+      showSlide(currentSlide);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); changeSlide(-1); }
+      if (e.key === 'Home') { e.preventDefault(); currentSlide = 1; showSlide(1); }
+      if (e.key === 'End') { e.preventDefault(); currentSlide = totalSlides; showSlide(totalSlides); }
+    });
+  </script>
+</body>
+</html>
