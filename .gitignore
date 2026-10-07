@@ -39,3 +39,13 @@ env/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Presentation, report, and script assets
+*.pptx
+*.pdf
+slide*_preview.png
+screenshot_*.png
+presentation.html
+video_script.md
+export_*.ps1
+generate_pptx.ps1
