@@ -30,7 +30,7 @@ st.markdown("""
     .risk-high { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; text-align: center; font-size: 1.4em; font-weight: bold; }
     .risk-severe { background-color: #d32f2f; color: white; padding: 15px; border-radius: 10px; text-align: center; font-size: 1.4em; font-weight: bold; }
     .metric-card { background-color: #f8f9fa; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
-    .disclaimer { background-color: #e3f2fd; padding: 12px; border-radius: 8px; border-left: 4px solid #1976d2; font-size: 0.9em; }
+    .disclaimer { background-color: #e3f2fd; color: #1a237e; padding: 12px; border-radius: 8px; border-left: 4px solid #1976d2; font-size: 0.9em; }
 </style>
 """, unsafe_allow_html=True)
 
