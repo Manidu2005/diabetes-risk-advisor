@@ -61,7 +61,7 @@ def get_recommendations(risk_category: str, patient_data: dict) -> list[str]:
     bmi = patient_data.get('BMI')
     if bmi is not None:
         if bmi > 35:
-            recommendations.append("Your BMI indicates severe obesity. Weight management is critical — consult a dietitian and physician.")
+            recommendations.append("Your BMI indicates severe obesity. Weight management is critical  --  consult a dietitian and physician.")
         elif bmi > 30:
             recommendations.append("Your BMI indicates obesity. Consider a structured weight management program with professional guidance.")
         elif 0 < bmi < 18.5:
@@ -70,7 +70,7 @@ def get_recommendations(risk_category: str, patient_data: dict) -> list[str]:
     bp = patient_data.get('BloodPressure')
     if bp is not None:
         if bp > 100:
-            recommendations.append("Your blood pressure is high. Consult a physician — antihypertensive evaluation may be needed.")
+            recommendations.append("Your blood pressure is high. Consult a physician  --  antihypertensive evaluation may be needed.")
         elif bp > 90:
             recommendations.append("Your blood pressure is elevated. Reduce sodium intake, manage stress, and monitor BP regularly.")
             
@@ -96,9 +96,123 @@ def get_recommendations(risk_category: str, patient_data: dict) -> list[str]:
     activity_level = patient_data.get('activity_level')
     if activity_level is not None:
         if activity_level >= 8:
-            recommendations.append("Great job maintaining an active lifestyle! Keep it up — regular exercise significantly reduces diabetes risk.")
+            recommendations.append("Great job maintaining an active lifestyle! Keep it up  --  regular exercise significantly reduces diabetes risk.")
         elif activity_level < 3:
             recommendations.append("Your activity level is low. Start with short daily walks and gradually increase to 150 minutes of moderate exercise per week.")
+            
+    # ── Gender-specific rules ────────────────────────────────────────────
+    gender = patient_data.get('Gender', '').strip().lower()
+    sex_code = patient_data.get('Sex_Code')
+    pregnancies = patient_data.get('Pregnancies', 0)
+    
+    if gender == 'female' or sex_code == 0:
+        if pregnancies and pregnancies >= 4 and category in ('HIGH', 'SEVERE'):
+            recommendations.append(
+                "Multiple pregnancies increase gestational diabetes risk and future Type 2 risk. "
+                "Discuss post-partum glucose monitoring with your OB-GYN."
+            )
+        if age is not None and age >= 40:
+            recommendations.append(
+                "Women over 40 have elevated diabetes risk. Annual HbA1c screening is recommended."
+            )
+    elif gender == 'male' or sex_code == 1:
+        if bmi is not None and bmi > 30 and age is not None and age > 45:
+            recommendations.append(
+                "Men over 45 with obesity have significantly elevated Type 2 diabetes risk. "
+                "Request a fasting glucose and HbA1c panel from your doctor."
+            )
+    
+    # ── HbA1c-specific rules ─────────────────────────────────────────────
+    hba1c = patient_data.get('HbA1c')
+    if hba1c is not None:
+        if hba1c >= 6.5:
+            recommendations.append(
+                "Your HbA1c level (>=6.5%) falls in the diabetic range. "
+                "Immediate medical consultation and treatment planning are essential."
+            )
+        elif hba1c >= 5.7:
+            recommendations.append(
+                "Your HbA1c level (5.7-6.4%) indicates prediabetes. "
+                "Lifestyle modifications can prevent or delay progression to Type 2 diabetes."
+            )
+        elif hba1c < 5.0 and glucose is not None and glucose > 140:
+            recommendations.append(
+                "Your HbA1c is normal but glucose is elevated  --  this may indicate "
+                "recent dietary factors or stress. Retest fasting glucose to confirm."
+            )
+    
+    # ── Hypertension & Heart Disease rules ───────────────────────────────
+    hypertension = patient_data.get('Hypertension', 0)
+    heart_disease = patient_data.get('HeartDisease', 0)
+    
+    if hypertension and heart_disease:
+        recommendations.append(
+            "Both hypertension and heart disease are present  --  this significantly compounds "
+            "diabetes risk. Comprehensive cardiovascular-metabolic management is critical."
+        )
+    elif hypertension:
+        recommendations.append(
+            "Hypertension is a major comorbid risk factor for diabetes complications. "
+            "Ensure blood pressure is well-controlled and monitor regularly."
+        )
+    elif heart_disease:
+        recommendations.append(
+            "Heart disease increases the severity of diabetes-related complications. "
+            "Coordinate diabetes management with your cardiologist."
+        )
+    
+    # ── Smoking rules ────────────────────────────────────────────────────
+    smoking = patient_data.get('SmokingHistory', 'never').lower().strip()
+    if smoking in ('current', 'ever'):
+        recommendations.append(
+            "Smoking significantly increases diabetes complications (cardiovascular, neuropathy). "
+            "Smoking cessation is strongly recommended  --  consult your doctor about cessation programs."
+        )
+    elif smoking in ('former', 'not current'):
+        recommendations.append(
+            "Former smokers retain some elevated risk. Continue to avoid tobacco "
+            "and maintain regular cardiovascular health screening."
+        )
+    
+    # ── Symptom-based screening rules (from Sylhet clinical data) ────────
+    symptoms = {
+        'Polyuria': patient_data.get('Polyuria', 0),
+        'Polydipsia': patient_data.get('Polydipsia', 0),
+        'SuddenWeightLoss': patient_data.get('SuddenWeightLoss', 0),
+        'Weakness': patient_data.get('Weakness', 0),
+        'Polyphagia': patient_data.get('Polyphagia', 0),
+        'GenitalThrush': patient_data.get('GenitalThrush', 0),
+        'VisualBlurring': patient_data.get('VisualBlurring', 0),
+        'Itching': patient_data.get('Itching', 0),
+        'Irritability': patient_data.get('Irritability', 0),
+        'DelayedHealing': patient_data.get('DelayedHealing', 0),
+        'PartialParesis': patient_data.get('PartialParesis', 0),
+        'MuscleStiffness': patient_data.get('MuscleStiffness', 0),
+        'Alopecia': patient_data.get('Alopecia', 0),
+    }
+    
+    # Count active symptoms
+    active_symptoms = [k for k, v in symptoms.items() if v]
+    symptom_count = len(active_symptoms)
+    
+    if symptom_count >= 5:
+        recommendations.append(
+            f"You report {symptom_count} diabetes-associated symptoms "
+            f"({', '.join(active_symptoms[:5])}{'...' if symptom_count > 5 else ''}). "
+            "This pattern is strongly suggestive  --  seek medical evaluation immediately."
+        )
+    elif symptom_count >= 3:
+        recommendations.append(
+            f"You report {symptom_count} diabetes-associated symptoms. "
+            "Consider scheduling a comprehensive diabetes screening."
+        )
+    
+    # Classic triad: polyuria + polydipsia + weight loss
+    if symptoms['Polyuria'] and symptoms['Polydipsia'] and symptoms['SuddenWeightLoss']:
+        recommendations.append(
+            "The classic triad of excessive urination, excessive thirst, and sudden weight loss "
+            "is strongly indicative of diabetes. Urgent medical evaluation is recommended."
+        )
             
     return recommendations
 
@@ -124,19 +238,19 @@ def format_recommendations(recommendations: list[str]) -> str:
 if __name__ == '__main__':
     profiles = [
         {
-            'name': 'Healthy young person',
+            'name': 'Healthy young woman',
             'risk_category': 'Low',
-            'data': {'Glucose': 90, 'BMI': 22, 'BloodPressure': 70, 'Age': 25, 'Insulin': 80, 'DiabetesPedigreeFunction': 0.2, 'activity_level': 8}
+            'data': {'Gender': 'Female', 'Sex_Code': 0, 'Pregnancies': 0, 'Glucose': 90, 'BMI': 22, 'BloodPressure': 70, 'Age': 25, 'Insulin': 80, 'DiabetesPedigreeFunction': 0.2, 'HbA1c': 5.0, 'Hypertension': 0, 'HeartDisease': 0, 'SmokingHistory': 'never', 'activity_level': 8}
         },
         {
-            'name': 'At-risk middle-aged',
+            'name': 'At-risk middle-aged man',
             'risk_category': 'Moderate',
-            'data': {'Glucose': 155, 'BMI': 32, 'BloodPressure': 88, 'Age': 50, 'Insulin': 180, 'DiabetesPedigreeFunction': 0.6, 'activity_level': 3}
+            'data': {'Gender': 'Male', 'Sex_Code': 1, 'Pregnancies': 0, 'Glucose': 155, 'BMI': 32, 'BloodPressure': 88, 'Age': 50, 'Insulin': 180, 'DiabetesPedigreeFunction': 0.6, 'HbA1c': 6.1, 'Hypertension': 1, 'HeartDisease': 0, 'SmokingHistory': 'former', 'activity_level': 3}
         },
         {
-            'name': 'High-risk elderly',
+            'name': 'High-risk elderly woman',
             'risk_category': 'Severe',
-            'data': {'Glucose': 195, 'BMI': 38, 'BloodPressure': 105, 'Age': 65, 'Insulin': 250, 'DiabetesPedigreeFunction': 0.9, 'activity_level': 2}
+            'data': {'Gender': 'Female', 'Sex_Code': 0, 'Pregnancies': 5, 'Glucose': 195, 'BMI': 38, 'BloodPressure': 105, 'Age': 65, 'Insulin': 250, 'DiabetesPedigreeFunction': 0.9, 'HbA1c': 8.2, 'Hypertension': 1, 'HeartDisease': 1, 'SmokingHistory': 'current', 'activity_level': 2}
         }
     ]
     

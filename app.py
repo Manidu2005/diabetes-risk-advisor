@@ -1,6 +1,7 @@
 """
-Diabetes Risk & Lifestyle Advisor — Streamlit Dashboard
+Diabetes Risk & Lifestyle Advisor  --  Streamlit Dashboard
 Chains: Neural Network → Fuzzy Logic → Rule-Based Engine
+Supports Male, Female, and Other patient demographics.
 """
 
 import streamlit as st
@@ -35,44 +36,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ── Sidebar ──────────────────────────────────────────────────────────────────
-with st.sidebar:
-    st.image("https://img.icons8.com/color/96/heart-with-pulse.png", width=64)
-    st.title("ℹ️ About")
-    st.markdown("""
-    **Diabetes Risk & Lifestyle Advisor** uses three AI techniques in a pipeline:
-    
-    1. 🧠 **Neural Network** — predicts diabetes risk probability from health metrics
-    2. 🌫️ **Fuzzy Logic** — categorizes risk considering BMI and activity level
-    3. 📋 **Rule-Based Engine** — generates personalized lifestyle recommendations
-    """)
-
-    st.divider()
-    st.subheader("📊 Dataset Info")
-    st.markdown("""
-    **Pima Indians Diabetes Dataset**
-    - 768 patients, 8 health metrics
-    - Source: NIDDK / UCI ML Repository
-    - Population: Pima Native American women, age ≥ 21
-    """)
-    
-    st.divider()
-    st.subheader("⚠️ Limitations")
-    st.markdown("""
-    - Dataset contains only women of Pima heritage
-    - Model may not generalize to other demographics
-    - This is a **screening tool**, not a medical diagnosis
-    """)
-
-    st.divider()
-    st.subheader("🛠️ Tech Stack")
-    st.markdown("""
-    - `scikit-learn` MLPClassifier
-    - `scikit-fuzzy` inference engine
-    - Python rule-based reasoning
-    - `Streamlit` dashboard
-    """)
-
 
 # ── Main Title ───────────────────────────────────────────────────────────────
 st.title("🩺 Diabetes Risk & Lifestyle Advisor")
@@ -86,56 +49,115 @@ st.subheader("📝 Patient Health Metrics")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    pregnancies = st.number_input(
-        "Pregnancies",
-        min_value=0, max_value=20, value=1, step=1,
-        help="Number of times pregnant"
+    gender = st.selectbox(
+        "Gender / Sex",
+        options=["Female", "Male", "Other"],
+        index=0,
+        help="Biological sex  --  affects risk factors and recommendations"
     )
+
+    # Map gender to Sex_Code
+    sex_code = {"Female": 0, "Male": 1, "Other": 2}[gender]
+
+    # Pregnancies  --  only show for Female
+    if gender == "Female":
+        pregnancies = st.number_input(
+            "Pregnancies",
+            min_value=0, max_value=20, value=1, step=1,
+            help="Number of times pregnant"
+        )
+    else:
+        pregnancies = 0
+        st.markdown(
+            '<div style="padding: 4px 0; color: #888; font-size: 0.85em;">'
+            '💡 Pregnancies auto-set to 0 for Male / Other</div>',
+            unsafe_allow_html=True,
+        )
+
     glucose = st.number_input(
         "Glucose (mg/dL)",
         min_value=0.0, max_value=300.0, value=120.0, step=1.0,
-        help="Plasma glucose concentration (2-hour oral glucose tolerance test)"
+        help="Plasma glucose concentration (fasting or 2-hour OGTT)"
     )
-    blood_pressure = st.number_input(
-        "Blood Pressure (mm Hg)",
-        min_value=0.0, max_value=200.0, value=72.0, step=1.0,
-        help="Diastolic blood pressure"
-    )
-
 with col2:
-    skin_thickness = st.number_input(
-        "Skin Thickness (mm)",
-        min_value=0.0, max_value=100.0, value=29.0, step=1.0,
-        help="Triceps skin fold thickness"
-    )
-    insulin = st.number_input(
-        "Insulin (μU/mL)",
-        min_value=0.0, max_value=900.0, value=125.0, step=1.0,
-        help="2-Hour serum insulin"
-    )
     bmi = st.number_input(
         "BMI (kg/m²)",
         min_value=0.0, max_value=70.0, value=28.0, step=0.1,
         help="Body Mass Index = weight(kg) / height(m)²"
-    )
-
-with col3:
-    dpf = st.number_input(
-        "Family History Score",
-        min_value=0.0, max_value=2.5, value=0.3725, step=0.01,
-        format="%.4f",
-        help="Diabetes Pedigree Function — scores genetic predisposition (typical range 0.08–2.42, median ≈ 0.37)"
     )
     age = st.number_input(
         "Age (years)",
         min_value=1, max_value=120, value=33, step=1,
         help="Patient age in years"
     )
+    hypertension = st.checkbox("🫀 Hypertension", value=False, help="Has been diagnosed with hypertension")
+    heart_disease = st.checkbox("❤️‍🩹 Heart Disease", value=False, help="Has been diagnosed with heart disease")
+
+with col3:
+    smoking_history = st.selectbox(
+        "🚬 Smoking History",
+        options=["Never", "Former", "Current"],
+        index=0,
+        help="Smoking status"
+    )
     activity_level = st.slider(
         "🏃 Activity Level",
         min_value=1, max_value=10, value=5,
         help="Self-reported: 1 = very sedentary, 10 = very active"
     )
+
+# ── Optional Inputs (improve accuracy when provided) ─────────────────────
+with st.expander("🔬 Optional Inputs (provide for more accurate analysis)", expanded=False):
+    st.caption(
+        "These fields are optional. When provided, they improve the accuracy "
+        "of the risk assessment and enable additional personalised recommendations."
+    )
+
+    opt_col1, opt_col2 = st.columns(2)
+
+    with opt_col1:
+        provide_hba1c = st.checkbox("I know my HbA1c (%)", value=False)
+        if provide_hba1c:
+            hba1c = st.number_input(
+                "HbA1c (%)",
+                min_value=0.0, max_value=15.0, value=5.5, step=0.1,
+                help="Glycated haemoglobin  --  Normal: <5.7%, Prediabetes: 5.7-6.4%, Diabetes: >=6.5%"
+            )
+        else:
+            hba1c = None
+
+        provide_bp = st.checkbox("I know my Blood Pressure", value=False)
+        if provide_bp:
+            blood_pressure = st.number_input(
+                "Blood Pressure (mm Hg)",
+                min_value=0.0, max_value=200.0, value=72.0, step=1.0,
+                help="Diastolic blood pressure"
+            )
+        else:
+            blood_pressure = None
+
+    with opt_col2:
+        provide_insulin = st.checkbox("I know my Insulin level", value=False)
+        if provide_insulin:
+            insulin = st.number_input(
+                "Insulin (μU/mL)",
+                min_value=0.0, max_value=900.0, value=125.0, step=1.0,
+                help="2-Hour serum insulin"
+            )
+        else:
+            insulin = None
+
+        provide_dpf = st.checkbox("I know my Family History Score", value=False)
+        if provide_dpf:
+            dpf = st.number_input(
+                "Family History Score",
+                min_value=0.0, max_value=2.5, value=0.3725, step=0.01,
+                format="%.4f",
+                help="Diabetes Pedigree Function  --  scores genetic predisposition "
+                     "(typical range 0.08-2.42, median ≈ 0.37)"
+            )
+        else:
+            dpf = None
 
 st.divider()
 
@@ -145,15 +167,20 @@ if st.button("🔍 Analyze Risk", type="primary", use_container_width=True):
     
     # Build patient data dict
     patient_data = {
+        'Gender': gender,
+        'Sex_Code': sex_code,
         'Pregnancies': pregnancies,
         'Glucose': glucose,
         'BloodPressure': blood_pressure,
-        'SkinThickness': skin_thickness,
         'Insulin': insulin,
         'BMI': bmi,
         'DiabetesPedigreeFunction': dpf,
+        'HbA1c': hba1c,
         'Age': age,
-        'activity_level': activity_level
+        'Hypertension': int(hypertension),
+        'HeartDisease': int(heart_disease),
+        'SmokingHistory': smoking_history.lower(),
+        'activity_level': activity_level,
     }
     
     # ── Stage 1: Neural Network ──────────────────────────────────────────
@@ -172,7 +199,7 @@ if st.button("🔍 Analyze Risk", type="primary", use_container_width=True):
     
     # ── Stage 2: Fuzzy Logic ─────────────────────────────────────────────
     with st.spinner("🌫️ Running Fuzzy Logic categorization..."):
-        fuzzy_result = categorize_risk(risk_prob, bmi, activity_level)
+        fuzzy_result = categorize_risk(risk_prob, bmi, activity_level, hba1c)
     
     # ── Stage 3: Rule-Based Recommendations ──────────────────────────────
     with st.spinner("📋 Generating recommendations..."):
@@ -181,6 +208,16 @@ if st.button("🔍 Analyze Risk", type="primary", use_container_width=True):
     # ── Display Results ──────────────────────────────────────────────────
     st.divider()
     st.subheader("📊 Risk Assessment Results")
+    
+    # Patient info banner
+    hba1c_str = f"HbA1c {hba1c}%" if hba1c is not None else "HbA1c: Not provided"
+    bp_str = f" · BP {blood_pressure:.0f} mmHg" if blood_pressure is not None else ""
+    st.markdown(
+        f"**Patient**: {gender}, Age {age} · BMI {bmi} · {hba1c_str}{bp_str} · "
+        f"Glucose {glucose} mg/dL · "
+        f"{'Hypertensive' if hypertension else 'Normotensive'} · "
+        f"Smoking: {smoking_history}"
+    )
     
     # Pipeline visualization
     st.markdown("**Pipeline**: Neural Network ➜ Fuzzy Logic ➜ Rule-Based Engine")
@@ -222,10 +259,14 @@ if st.button("🔍 Analyze Risk", type="primary", use_container_width=True):
             icon = "🏃"
         elif any(word in rec.lower() for word in ['diet', 'food', 'sugar', 'carbohydrate', 'caloric', 'sodium', 'glycemic', 'hydrated']):
             icon = "🥗"
-        elif any(word in rec.lower() for word in ['doctor', 'physician', 'medical', 'consult', 'screening', 'check-up', 'counseling', 'medication']):
+        elif any(word in rec.lower() for word in ['doctor', 'physician', 'medical', 'consult', 'screening', 'check-up', 'counseling', 'medication', 'ob-gyn', 'cardiologist']):
             icon = "🏥"
-        elif any(word in rec.lower() for word in ['monitor', 'glucose level', 'blood pressure', 'weight', 'bmi']):
+        elif any(word in rec.lower() for word in ['monitor', 'glucose level', 'blood pressure', 'weight', 'bmi', 'hba1c']):
             icon = "📏"
+        elif any(word in rec.lower() for word in ['smoking', 'tobacco', 'cessation']):
+            icon = "🚭"
+        elif any(word in rec.lower() for word in ['symptom', 'polyuria', 'polydipsia', 'triad']):
+            icon = "🔬"
         else:
             icon = "✅"
         st.markdown(f"{icon} **{i}.** {rec}")
@@ -234,41 +275,11 @@ if st.button("🔍 Analyze Risk", type="primary", use_container_width=True):
     st.divider()
     st.markdown(f'<div class="disclaimer">{disclaimer}</div>', unsafe_allow_html=True)
 
-    # ── Detailed Breakdown (Expander) ────────────────────────────────────
-    with st.expander("🔎 View Detailed Pipeline Breakdown"):
-        st.markdown("##### Stage 1: Neural Network")
-        st.json({
-            "input": {k: v for k, v in patient_data.items() if k != 'activity_level'},
-            "output": {"risk_probability": round(risk_prob, 4)}
-        })
-        
-        st.markdown("##### Stage 2: Fuzzy Logic")
-        st.json({
-            "input": {
-                "risk_probability": round(risk_prob, 4),
-                "bmi": bmi,
-                "activity_level": activity_level
-            },
-            "output": fuzzy_result
-        })
-        
-        st.markdown("##### Stage 3: Rule-Based Engine")
-        st.json({
-            "input": {
-                "risk_category": fuzzy_result['category'],
-                "patient_metrics_checked": list(patient_data.keys())
-            },
-            "output": {
-                "recommendation_count": len(actual_recs),
-                "recommendations": actual_recs
-            }
-        })
-
 
 # ── Footer ───────────────────────────────────────────────────────────────────
 st.divider()
 st.caption(
-    "🩺 **Diabetes Risk & Lifestyle Advisor** — "
+    "🩺 **Diabetes Risk & Lifestyle Advisor**  --  "
     "Essentials of Artificial Intelligence Group Assignment  \n"
     "⚠️ This tool is for **educational and screening purposes only**. "
     "It is NOT a substitute for professional medical advice, diagnosis, or treatment. "

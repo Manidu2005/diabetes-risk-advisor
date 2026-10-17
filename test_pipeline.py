@@ -1,7 +1,8 @@
 """
 End-to-End Test Pipeline for the Diabetes Risk & Lifestyle Advisor.
 Runs multiple test profiles through all three modules and the full pipeline,
-printing a formatted results table.
+printing a formatted results table covering diverse demographics (Male, Female, Other)
+and clinical indicators (HbA1c, Hypertension, Heart Disease, Smoking History).
 """
 
 import os
@@ -29,139 +30,156 @@ def run_test_profiles():
         {
             "name": "Healthy Young Woman",
             "data": {
-                "Pregnancies": 0, "Glucose": 85.0, "BloodPressure": 66.0,
-                "SkinThickness": 25.0, "Insulin": 80.0, "BMI": 21.5,
-                "DiabetesPedigreeFunction": 0.15, "Age": 22,
-                "activity_level": 8
+                "Gender": "Female", "Sex_Code": 0, "Pregnancies": 0,
+                "Glucose": 85.0, "BloodPressure": 66.0, "SkinThickness": 25.0,
+                "Insulin": 80.0, "BMI": 21.5, "DiabetesPedigreeFunction": 0.15,
+                "HbA1c": 4.8, "Age": 22, "Hypertension": 0, "HeartDisease": 0,
+                "SmokingHistory": "never", "activity_level": 8
             }
         },
         {
-            "name": "Average Middle-Aged",
+            "name": "Healthy Young Man",
             "data": {
-                "Pregnancies": 3, "Glucose": 110.0, "BloodPressure": 74.0,
-                "SkinThickness": 30.0, "Insulin": 120.0, "BMI": 26.0,
-                "DiabetesPedigreeFunction": 0.35, "Age": 40,
-                "activity_level": 5
+                "Gender": "Male", "Sex_Code": 1, "Pregnancies": 0,
+                "Glucose": 90.0, "BloodPressure": 70.0, "SkinThickness": 20.0,
+                "Insulin": 75.0, "BMI": 23.0, "DiabetesPedigreeFunction": 0.18,
+                "HbA1c": 5.0, "Age": 25, "Hypertension": 0, "HeartDisease": 0,
+                "SmokingHistory": "never", "activity_level": 9
             }
         },
         {
-            "name": "Overweight Sedentary",
+            "name": "Non-Binary Young Adult",
             "data": {
-                "Pregnancies": 5, "Glucose": 145.0, "BloodPressure": 82.0,
-                "SkinThickness": 35.0, "Insulin": 175.0, "BMI": 33.0,
-                "DiabetesPedigreeFunction": 0.55, "Age": 48,
-                "activity_level": 2
+                "Gender": "Other", "Sex_Code": 2, "Pregnancies": 0,
+                "Glucose": 95.0, "BloodPressure": 68.0, "SkinThickness": 22.0,
+                "Insulin": 85.0, "BMI": 24.0, "DiabetesPedigreeFunction": 0.20,
+                "HbA1c": 5.1, "Age": 28, "Hypertension": 0, "HeartDisease": 0,
+                "SmokingHistory": "never", "activity_level": 7
             }
         },
         {
-            "name": "High-Risk Elderly",
+            "name": "Middle-Aged Woman (Moderate Risk)",
             "data": {
-                "Pregnancies": 8, "Glucose": 190.0, "BloodPressure": 95.0,
-                "SkinThickness": 40.0, "Insulin": 260.0, "BMI": 39.0,
-                "DiabetesPedigreeFunction": 0.85, "Age": 62,
-                "activity_level": 2
+                "Gender": "Female", "Sex_Code": 0, "Pregnancies": 3,
+                "Glucose": 130.0, "BloodPressure": 78.0, "SkinThickness": 30.0,
+                "Insulin": 140.0, "BMI": 28.5, "DiabetesPedigreeFunction": 0.45,
+                "HbA1c": 5.9, "Age": 42, "Hypertension": 0, "HeartDisease": 0,
+                "SmokingHistory": "former", "activity_level": 5
             }
         },
         {
-            "name": "Borderline Case A",
+            "name": "Middle-Aged Man (Moderate Risk)",
             "data": {
-                "Pregnancies": 2, "Glucose": 130.0, "BloodPressure": 78.0,
-                "SkinThickness": 28.0, "Insulin": 140.0, "BMI": 27.5,
-                "DiabetesPedigreeFunction": 0.45, "Age": 35,
-                "activity_level": 5
+                "Gender": "Male", "Sex_Code": 1, "Pregnancies": 0,
+                "Glucose": 140.0, "BloodPressure": 82.0, "SkinThickness": 28.0,
+                "Insulin": 155.0, "BMI": 30.0, "DiabetesPedigreeFunction": 0.50,
+                "HbA1c": 6.0, "Age": 48, "Hypertension": 1, "HeartDisease": 0,
+                "SmokingHistory": "current", "activity_level": 3
             }
         },
         {
-            "name": "Borderline Case B",
+            "name": "High-Risk Elderly Woman",
             "data": {
-                "Pregnancies": 4, "Glucose": 140.0, "BloodPressure": 85.0,
-                "SkinThickness": 32.0, "Insulin": 160.0, "BMI": 30.5,
-                "DiabetesPedigreeFunction": 0.50, "Age": 44,
-                "activity_level": 4
+                "Gender": "Female", "Sex_Code": 0, "Pregnancies": 6,
+                "Glucose": 190.0, "BloodPressure": 95.0, "SkinThickness": 38.0,
+                "Insulin": 260.0, "BMI": 37.0, "DiabetesPedigreeFunction": 0.85,
+                "HbA1c": 7.8, "Age": 62, "Hypertension": 1, "HeartDisease": 1,
+                "SmokingHistory": "former", "activity_level": 2
             }
         },
         {
-            "name": "Very Active, Family History",
+            "name": "High-Risk Man (Smoker)",
             "data": {
-                "Pregnancies": 1, "Glucose": 100.0, "BloodPressure": 68.0,
-                "SkinThickness": 22.0, "Insulin": 90.0, "BMI": 23.0,
-                "DiabetesPedigreeFunction": 0.90, "Age": 30,
-                "activity_level": 9
+                "Gender": "Male", "Sex_Code": 1, "Pregnancies": 0,
+                "Glucose": 185.0, "BloodPressure": 92.0, "SkinThickness": 32.0,
+                "Insulin": 220.0, "BMI": 35.0, "DiabetesPedigreeFunction": 0.70,
+                "HbA1c": 7.2, "Age": 55, "Hypertension": 1, "HeartDisease": 0,
+                "SmokingHistory": "current", "activity_level": 2
             }
         },
         {
-            "name": "Extreme High Risk",
+            "name": "Extreme Risk (Severe)",
             "data": {
-                "Pregnancies": 10, "Glucose": 200.0, "BloodPressure": 110.0,
-                "SkinThickness": 45.0, "Insulin": 300.0, "BMI": 42.0,
-                "DiabetesPedigreeFunction": 1.2, "Age": 55,
-                "activity_level": 1
+                "Gender": "Male", "Sex_Code": 1, "Pregnancies": 0,
+                "Glucose": 210.0, "BloodPressure": 110.0, "SkinThickness": 45.0,
+                "Insulin": 300.0, "BMI": 42.0, "DiabetesPedigreeFunction": 1.2,
+                "HbA1c": 9.5, "Age": 58, "Hypertension": 1, "HeartDisease": 1,
+                "SmokingHistory": "current", "activity_level": 1
             }
         },
         {
-            "name": "Young Underweight",
+            "name": "Prediabetic Non-Binary",
             "data": {
-                "Pregnancies": 0, "Glucose": 75.0, "BloodPressure": 60.0,
-                "SkinThickness": 15.0, "Insulin": 50.0, "BMI": 17.0,
-                "DiabetesPedigreeFunction": 0.10, "Age": 20,
-                "activity_level": 7
+                "Gender": "Other", "Sex_Code": 2, "Pregnancies": 0,
+                "Glucose": 115.0, "BloodPressure": 75.0, "SkinThickness": 26.0,
+                "Insulin": 110.0, "BMI": 27.0, "DiabetesPedigreeFunction": 0.35,
+                "HbA1c": 6.2, "Age": 35, "Hypertension": 0, "HeartDisease": 0,
+                "SmokingHistory": "never", "activity_level": 6
             }
         },
         {
-            "name": "High BP, Normal Glucose",
+            "name": "Active Man, Family History",
             "data": {
-                "Pregnancies": 6, "Glucose": 100.0, "BloodPressure": 105.0,
-                "SkinThickness": 33.0, "Insulin": 130.0, "BMI": 29.0,
-                "DiabetesPedigreeFunction": 0.40, "Age": 52,
-                "activity_level": 4
+                "Gender": "Male", "Sex_Code": 1, "Pregnancies": 0,
+                "Glucose": 100.0, "BloodPressure": 68.0,
+                "Insulin": 90.0, "BMI": 23.0, "DiabetesPedigreeFunction": 0.90,
+                "HbA1c": 5.3, "Age": 30, "Hypertension": 0, "HeartDisease": 0,
+                "SmokingHistory": "never", "activity_level": 9
+            }
+        },
+        {
+            "name": "Minimal Inputs (No Optionals)",
+            "data": {
+                "Gender": "Female", "Sex_Code": 0, "Pregnancies": 0,
+                "Glucose": 125.0, "BloodPressure": None,
+                "Insulin": None, "BMI": 27.5, "DiabetesPedigreeFunction": None,
+                "HbA1c": None, "Age": 35, "Hypertension": 0, "HeartDisease": 0,
+                "SmokingHistory": "never", "activity_level": 5
             }
         },
     ]
 
     # Header
     print("=" * 100)
-    print("DIABETES RISK & LIFESTYLE ADVISOR — FULL PIPELINE TEST")
+    print("DIABETES RISK & LIFESTYLE ADVISOR  --  FULL PIPELINE TEST")
     print("=" * 100)
     print()
-    print(f"{'Profile':<28} {'NN Prob':>8} {'Fuzzy Score':>12} {'Category':>10} {'# Recs':>7}")
+    print(f"{'Profile':<28} {'Gender':>7} {'NN Prob':>8} {'Fuzzy Score':>12} {'Category':>10} {'# Recs':>7}")
     print("-" * 100)
 
     for profile in test_profiles:
         name = profile["name"]
         data = profile["data"]
-
-        # Strip activity_level for NN (it doesn't use it)
-        nn_data = {k: v for k, v in data.items() if k != "activity_level"}
+        gender = data.get("Gender", "Unknown")
 
         # Stage 1: Neural Network
-        risk_prob = predict_risk(nn_data)
+        risk_prob = predict_risk(data)
 
         # Stage 2: Fuzzy Logic
-        fuzzy_result = categorize_risk(risk_prob, data["BMI"], data["activity_level"])
+        fuzzy_result = categorize_risk(risk_prob, data["BMI"], data["activity_level"], data.get("HbA1c"))
 
         # Stage 3: Rule-Based Engine
         recommendations = get_recommendations(fuzzy_result["category"], data)
         num_recs = len(recommendations) - 1  # Exclude disclaimer
 
         # Print summary row
-        print(f"{name:<28} {risk_prob:>7.4f} {fuzzy_result['score']:>11.2f} {fuzzy_result['category']:>10} {num_recs:>7}")
+        print(f"{name:<28} {gender:>7} {risk_prob:>8.4f} {fuzzy_result['score']:>12.2f} {fuzzy_result['category']:>10} {num_recs:>7}")
 
     print("-" * 100)
     print()
 
-    # Detailed output for two key profiles
+    # Detailed output for selected profiles
     print("=" * 100)
-    print("DETAILED OUTPUT — Selected Profiles")
+    print("DETAILED OUTPUT  --  Selected Profiles")
     print("=" * 100)
 
-    for idx in [0, 3, 7]:  # Healthy, High-Risk Elderly, Extreme
+    for idx in [0, 5, 7]:  # Healthy Young Woman, High-Risk Elderly Woman, Extreme Risk
         profile = test_profiles[idx]
         name = profile["name"]
         data = profile["data"]
-        nn_data = {k: v for k, v in data.items() if k != "activity_level"}
 
-        risk_prob = predict_risk(nn_data)
-        fuzzy_result = categorize_risk(risk_prob, data["BMI"], data["activity_level"])
+        risk_prob = predict_risk(data)
+        fuzzy_result = categorize_risk(risk_prob, data["BMI"], data["activity_level"], data.get("HbA1c"))
         recommendations = get_recommendations(fuzzy_result["category"], data)
 
         print(f"\n--- {name} ---")
@@ -183,9 +201,11 @@ def test_individual_modules():
     # Test NN module
     print("\n--- Neural Network Module ---")
     test_data = {
-        "Pregnancies": 3, "Glucose": 148.0, "BloodPressure": 72.0,
-        "SkinThickness": 35.0, "Insulin": 150.0, "BMI": 33.6,
-        "DiabetesPedigreeFunction": 0.627, "Age": 50
+        "Gender": "Female", "Sex_Code": 0, "Pregnancies": 3,
+        "Glucose": 148.0, "BloodPressure": 72.0,
+        "Insulin": 150.0, "BMI": 33.6, "DiabetesPedigreeFunction": 0.627,
+        "HbA1c": 6.5, "Age": 50, "Hypertension": 1, "HeartDisease": 0,
+        "SmokingHistory": "former", "activity_level": 4
     }
     prob = predict_risk(test_data)
     assert 0.0 <= prob <= 1.0, f"Risk probability out of range: {prob}"
@@ -193,12 +213,19 @@ def test_individual_modules():
 
     # Test Fuzzy module
     print("\n--- Fuzzy Logic Module ---")
-    for rp, b, a in [(0.1, 22.0, 8.0), (0.5, 30.0, 5.0), (0.9, 40.0, 1.0)]:
-        result = categorize_risk(rp, b, a)
+    fuzzy_test_cases = [
+        (0.1, 22.0, 8.0, 4.8),
+        (0.5, 30.0, 5.0, 6.0),
+        (0.9, 40.0, 1.0, 8.5),
+        (0.4, 26.0, 6.0, None),  # Test without HbA1c
+    ]
+    for rp, b, a, h in fuzzy_test_cases:
+        result = categorize_risk(rp, b, a, h)
         assert "category" in result, "Missing 'category' key"
         assert "score" in result, "Missing 'score' key"
         assert result["category"] in ["Low", "Moderate", "High", "Severe"], f"Invalid category: {result['category']}"
-        print(f"  [PASS] categorize_risk({rp}, {b}, {a}) -> {result['category']} (score: {result['score']:.2f})")
+        h_str = f"hba1c={h}" if h is not None else "hba1c=None (optional)"
+        print(f"  [PASS] categorize_risk({rp}, {b}, {a}, {h_str}) -> {result['category']} (score: {result['score']:.2f})")
 
     # Test Rules module
     print("\n--- Rule-Based Engine Module ---")
