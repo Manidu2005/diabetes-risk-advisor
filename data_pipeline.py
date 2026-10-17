@@ -84,23 +84,49 @@ def load_mustafa(filepath: str | None = None) -> pd.DataFrame:
 
 def load_dtd(filepath: str | None = None) -> pd.DataFrame:
     """
-    Load Multi-Type Diabetes Dataset (DTD  --  12,016 rows).
-    Columns: Sex, NPregnancies, Age, BPressure, BMI, HbA1c,
-             Insulin, FGlucose, PGlucose, Diagnosis, DiagnosisType
+    Load Multi-Type Diabetes Dataset (DTD).
+    Supports either:
+      - diabetes.csv (Sex, Age, BPressure, BMI, HbA1c, FGlucose, Diagnosis, ...)
+      - diabetes_dataset00.csv (Target, Age, BMI, Blood Glucose Levels, Blood Pressure, ...)
     """
     if filepath is None:
-        filepath = os.path.join(
-            BASE_DIR, 'datasets', 'dtd_multitype', 'diabetes.csv',
-        )
-    if not os.path.isfile(filepath):
+        p1 = os.path.join(BASE_DIR, 'datasets', 'dtd_multitype', 'diabetes.csv')
+        p2 = os.path.join(BASE_DIR, 'datasets', 'dtd_multitype', 'diabetes_dataset00.csv')
+        filepath = p1 if os.path.isfile(p1) else (p2 if os.path.isfile(p2) else None)
+
+    if filepath is None or not os.path.isfile(filepath):
         return pd.DataFrame()
 
     df = pd.read_csv(filepath)
     df.drop_duplicates(inplace=True)
 
-    # Gender
+    # Format 2: diabetes_dataset00.csv schema
+    if 'Blood Glucose Levels' in df.columns and 'Target' in df.columns:
+        res = pd.DataFrame()
+        res['Age'] = df['Age'].astype(int)
+        res['BMI'] = df['BMI'].astype(float)
+        res['Glucose'] = df['Blood Glucose Levels'].astype(float)
+        # Estimate HbA1c from Glucose via ADAG formula
+        res['HbA1c'] = ((res['Glucose'] + 46.7) / 28.7).round(1)
+        res['Hypertension'] = (df['Blood Pressure'] >= 140).astype(int) if 'Blood Pressure' in df.columns else 0
+        res['HeartDisease'] = 0
+        if 'Smoking Status' in df.columns:
+            res['SmokingEncoded'] = df['Smoking Status'].map({'Smoker': 2, 'Non-Smoker': 0}).fillna(0).astype(int)
+        else:
+            res['SmokingEncoded'] = 0
+
+        # Gender inference based on obstetric history
+        pcos = df['History of PCOS'].str.lower() == 'yes' if 'History of PCOS' in df.columns else False
+        gest = df['Previous Gestational Diabetes'].str.lower() == 'yes' if 'Previous Gestational Diabetes' in df.columns else False
+        preg = df['Pregnancy History'].str.lower() == 'yes' if 'Pregnancy History' in df.columns else False
+        is_female = pcos | gest | preg
+        res['Sex_Code'] = np.where(is_female, 0, 1)
+        res['Outcome'] = 1
+        return res[FEATURE_COLUMNS + [TARGET_COLUMN]]
+
+    # Format 1: original DTD schema (diabetes.csv)
     sex_map = {'Female': 0, 'female': 0, 'Male': 1, 'male': 1}
-    df['Sex_Code'] = df['Sex'].map(sex_map).fillna(2).astype(int)
+    df['Sex_Code'] = df['Sex'].map(sex_map).fillna(2).astype(int) if 'Sex' in df.columns else 2
 
     df = df.rename(columns={
         'Age': 'Age', 'BMI': 'BMI',
@@ -108,25 +134,22 @@ def load_dtd(filepath: str | None = None) -> pd.DataFrame:
     })
 
     # Ensure Glucose is mg/dL (convert mmol/L → mg/dL if max < 35)
-    if df['Glucose'].max() < 35:
+    if 'Glucose' in df.columns and df['Glucose'].max() < 35:
         df['Glucose'] = df['Glucose'] * 18.0182
 
     # Ensure HbA1c is in % (convert mmol/mol → % if max > 20)
-    if df['HbA1c'].max() > 20:
+    if 'HbA1c' in df.columns and df['HbA1c'].max() > 20:
         df['HbA1c'] = (0.09148 * df['HbA1c']) + 2.152
 
-    # Binary outcome from Diagnosis column
     if 'Diagnosis' in df.columns:
         df['Outcome'] = df['Diagnosis'].astype(int)
     else:
         df['Outcome'] = 0
 
-    # Fill missing comorbidity columns
     df['Hypertension'] = 0
     df['HeartDisease'] = 0
     df['SmokingEncoded'] = 0
 
-    # Impute zeros
     for col in ['Glucose', 'BMI', 'HbA1c']:
         if col in df.columns:
             df[col] = df[col].replace(0, np.nan)
