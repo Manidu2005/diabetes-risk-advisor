@@ -158,6 +158,43 @@ def load_dtd(filepath: str | None = None) -> pd.DataFrame:
     return df[FEATURE_COLUMNS + [TARGET_COLUMN]]
 
 
+def load_pima(filepath: str | None = None) -> pd.DataFrame:
+    """
+    Load the Pima Indians Diabetes Dataset (768 rows).
+    Columns: Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin,
+             BMI, DiabetesPedigreeFunction, Age, Outcome
+    """
+    if filepath is None:
+        p1 = os.path.join(BASE_DIR, 'datasets', 'pima_indians', 'diabetes.csv')
+        p2 = os.path.join(BASE_DIR, 'diabetes.csv')
+        filepath = p1 if os.path.isfile(p1) else (p2 if os.path.isfile(p2) else None)
+
+    if filepath is None or not os.path.isfile(filepath):
+        return pd.DataFrame()
+
+    df = pd.read_csv(filepath)
+    df.drop_duplicates(inplace=True)
+
+    # Impute biologically impossible zeros for physiological metrics
+    for col in ['Glucose', 'BloodPressure', 'BMI']:
+        if col in df.columns:
+            df[col] = df[col].replace(0, np.nan)
+            df[col] = df[col].fillna(df[col].median())
+
+    res = pd.DataFrame(index=df.index)
+    res['Sex_Code'] = 0  # All Pima dataset subjects are female
+    res['Age'] = df['Age'].astype(int)
+    res['BMI'] = df['BMI'].astype(float)
+    res['Glucose'] = df['Glucose'].astype(float)
+    res['HbA1c'] = ((res['Glucose'] + 46.7) / 28.7).round(1)
+    res['Hypertension'] = (df['BloodPressure'] >= 90).astype(int) if 'BloodPressure' in df.columns else 0
+    res['HeartDisease'] = 0
+    res['SmokingEncoded'] = 0
+    res['Outcome'] = df['Outcome'].astype(int)
+
+    return res[FEATURE_COLUMNS + [TARGET_COLUMN]]
+
+
 # ---------------------------------------------------------------------------
 # Synthetic data generator (fallback when real data is unavailable)
 # ---------------------------------------------------------------------------
@@ -239,9 +276,16 @@ def load_training_data() -> pd.DataFrame:
         print(f"[data_pipeline] Loaded DTD multi-type: {len(df_d):,} rows")
         frames.append(df_d)
 
+    # Try Pima Indians
+    df_p = load_pima()
+    if not df_p.empty:
+        print(f"[data_pipeline] Loaded Pima Indians: {len(df_p):,} rows")
+        frames.append(df_p)
+
     if frames:
         combined = pd.concat(frames, ignore_index=True)
         combined.drop_duplicates(inplace=True)
+        combined.dropna(inplace=True)
         print(f"[data_pipeline] Combined dataset: {len(combined):,} rows")
         return combined
 

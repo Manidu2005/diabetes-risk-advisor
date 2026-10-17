@@ -30,6 +30,10 @@ DATASETS = {
         'kaggle_id': 'ishandutta/early-stage-diabetes-risk-prediction-dataset',
         'description': 'Early-Stage Diabetes Risk Prediction (520 rows)',
     },
+    'pima_indians': {
+        'kaggle_id': 'uciml/pima-indians-diabetes-database',
+        'description': 'Pima Indians Diabetes Dataset (768 rows)',
+    },
 }
 
 

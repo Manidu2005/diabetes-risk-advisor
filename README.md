@@ -50,16 +50,18 @@ streamlit run app.py
 | `fuzzy_engine.py` | Fuzzy logic — membership functions, inference rules |
 | `rules_engine.py` | Rule-based engine — personalized recommendations |
 | `app.py` | Streamlit dashboard — UI integrating all three modules |
-| `test_pipeline.py` | End-to-end test suite with 10 test profiles |
-| `diabetes.csv` | Pima Indians Diabetes Dataset (768 records) |
+| `test_pipeline.py` | End-to-end test suite with test profiles |
+| `data_pipeline.py` | Multi-dataset loader, cleaning, and harmonization |
+| `datasets/` | Directory housing all datasets (Pima, Mustafa 100k, DTD, Sylhet) |
 | `requirements.txt` | Python dependencies |
 
-## Dataset
+## Datasets
 
-**Pima Indians Diabetes Dataset** (NIDDK / UCI ML Repository)
-- 768 records, 8 predictors, binary outcome
-- Columns: Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age, Outcome
-- Known limitation: data is entirely from adult women of Pima Native American heritage
+All datasets are consolidated in the `datasets/` directory:
+- **`datasets/mustafa_100k/`**: Comprehensive Diabetes Prediction Dataset (100k records, multi-gender)
+- **`datasets/dtd_multitype/`**: Multi-Type Diabetes Dataset (70k records)
+- **`datasets/pima_indians/`**: Pima Indians Diabetes Dataset (768 records)
+- **`datasets/sylhet_symptoms/`**: Early-Stage Diabetes Risk Prediction (520 records)
 
 ## AI Techniques
 
